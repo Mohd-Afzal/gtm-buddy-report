@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales Enablement Command Center | GTM Buddy Analytics</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg-primary: #0a0e1a;
+  --bg-card: #111827;
+  --bg-card-hover: #1a2332;
+  --border: #1e293b;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent-blue: #3b82f6;
+  --accent-cyan: #06b6d4;
+  --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-rose: #f43f5e;
+  --accent-violet: #8b5cf6;
+  --accent-orange: #f97316;
+  --gradient-blue: linear-gradient(135deg, #3b82f6, #06b6d4);
+  --gradient-emerald: linear-gradient(135deg, #10b981, #06b6d4);
+  --gradient-amber: linear-gradient(135deg, #f59e0b, #f97316);
+  --gradient-rose: linear-gradient(135deg, #f43f5e, #ec4899);
+  --gradient-violet: linear-gradient(135deg, #8b5cf6, #3b82f6);
+  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 24px 40px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(20px);
+}
+.header-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.header-left h1 {
+  font-size: 22px;
+  font-weight: 700;
+  background: var(--gradient-blue);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+}
+.header-left p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  font-family: 'Space Mono', monospace;
+}
+.header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(59,130,246,0.1);
+  border: 1px solid rgba(59,130,246,0.2);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--accent-emerald);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+/* Navigation Tabs */
+.nav-tabs {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 16px 40px 0;
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.nav-tab {
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-family: 'DM Sans', sans-serif;
+}
+.nav-tab:hover { color: var(--text-secondary); }
+.nav-tab.active {
+  color: var(--accent-blue);
+  border-bottom-color: var(--accent-blue);
+}
+
+/* Main Container */
+.main { max-width: 1600px; margin: 0 auto; padding: 24px 40px 60px; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Grid Layouts */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.chart-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+.chart-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+/* KPI Cards */
+.kpi-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+.kpi-card:hover {
+  background: var(--bg-card-hover);
+  border-color: rgba(59,130,246,0.3);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+.kpi-card .kpi-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+.kpi-card .kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  font-family: 'Space Mono', monospace;
+}
+.kpi-card .kpi-value {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+.kpi-card .kpi-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+.kpi-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-top: 8px;
+}
+.kpi-trend.up { background: rgba(16,185,129,0.1); color: var(--accent-emerald); }
+.kpi-trend.down { background: rgba(244,63,94,0.1); color: var(--accent-rose); }
+.kpi-trend.neutral { background: rgba(148,163,184,0.1); color: var(--text-secondary); }
+
+/* Chart Cards */
+.chart-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.3s;
+}
+.chart-card:hover {
+  border-color: rgba(59,130,246,0.2);
+}
+.chart-card h3 {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--text-primary);
+}
+.chart-card .chart-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  font-family: 'Space Mono', monospace;
+}
+.chart-card canvas {
+  max-height: 300px;
+}
+
+/* Section Headers */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 32px 0 16px;
+}
+.section-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.section-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Data Tables */
+.data-table-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.data-table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  background: rgba(30,41,59,0.5);
+  border-bottom: 1px solid var(--border);
+  font-family: 'Space Mono', monospace;
+}
+.data-table td {
+  padding: 12px 16px;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(30,41,59,0.3);
+  color: var(--text-secondary);
+}
+.data-table tr:hover td {
+  background: rgba(59,130,246,0.03);
+  color: var(--text-primary);
+}
+.data-table .name-cell { font-weight: 600; color: var(--text-primary); }
+.data-table .number-cell { font-family: 'Space Mono', monospace; font-size: 12px; }
+
+/* Badges & Tags */
+.team-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.team-badge.bdr { background: rgba(59,130,246,0.1); color: var(--accent-blue); }
+.team-badge.sdr { background: rgba(139,92,246,0.1); color: var(--accent-violet); }
+.team-badge.ae { background: rgba(16,185,129,0.1); color: var(--accent-emerald); }
+.team-badge.am { background: rgba(245,158,11,0.1); color: var(--accent-amber); }
+.team-badge.se { background: rgba(6,182,212,0.1); color: var(--accent-cyan); }
+.team-badge.cs { background: rgba(249,115,22,0.1); color: var(--accent-orange); }
+.team-badge.partner { background: rgba(244,63,94,0.1); color: var(--accent-rose); }
+
+.score-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+}
+.score-badge.high { background: rgba(16,185,129,0.15); color: var(--accent-emerald); }
+.score-badge.medium { background: rgba(245,158,11,0.15); color: var(--accent-amber); }
+.score-badge.low { background: rgba(244,63,94,0.15); color: var(--accent-rose); }
+
+/* Progress Bars */
+.progress-bar-bg {
+  width: 100%;
+  height: 6px;
+  background: rgba(30,41,59,0.5);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s ease-out;
+}
+
+/* Insight Cards */
+.insight-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  border-left: 3px solid;
+}
+.insight-card.action { border-left-color: var(--accent-blue); }
+.insight-card.warning { border-left-color: var(--accent-amber); }
+.insight-card.success { border-left-color: var(--accent-emerald); }
+.insight-card.critical { border-left-color: var(--accent-rose); }
+.insight-card h4 {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.insight-card p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.insight-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+.insight-tag.action { background: rgba(59,130,246,0.1); color: var(--accent-blue); }
+.insight-tag.warning { background: rgba(245,158,11,0.1); color: var(--accent-amber); }
+.insight-tag.success { background: rgba(16,185,129,0.1); color: var(--accent-emerald); }
+.insight-tag.critical { background: rgba(244,63,94,0.1); color: var(--accent-rose); }
+
+/* Role Play Cards */
+.roleplay-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.roleplay-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+}
+.roleplay-card h4 {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.roleplay-card .rp-scenario {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+  font-family: 'Space Mono', monospace;
+}
+.rp-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.rp-metric {
+  text-align: center;
+  padding: 8px;
+  background: rgba(30,41,59,0.3);
+  border-radius: 8px;
+}
+.rp-metric .value {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+}
+.rp-metric .label {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Radar skill bars */
+.skill-bar-group { margin-top: 12px; }
+.skill-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.skill-bar-item .skill-name {
+  width: 140px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+.skill-bar-item .skill-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(30,41,59,0.5);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.skill-bar-item .skill-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+.skill-bar-item .skill-score {
+  width: 30px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+  text-align: right;
+}
+
+/* Search analytics */
+.search-list {
+  list-style: none;
+}
+.search-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(30,41,59,0.3);
+  font-size: 13px;
+}
+.search-list li:last-child { border-bottom: none; }
+.search-query { color: var(--text-primary); font-weight: 500; }
+.search-count {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+  background: rgba(30,41,59,0.5);
+  padding: 2px 10px;
+  border-radius: 10px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+  .chart-grid-3 { grid-template-columns: 1fr 1fr; }
+  .roleplay-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .chart-grid-2, .chart-grid-3 { grid-template-columns: 1fr; }
+  .roleplay-grid { grid-template-columns: 1fr; }
+  .main { padding: 16px 20px; }
+  .header { padding: 16px 20px; }
+  .nav-tabs { padding: 12px 20px 0; }
+}
+
+/* Full width chart */
+.full-width { grid-column: 1 / -1; }
+
+/* Animated entry */
+.animate-in {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: fadeUp 0.5s ease-out forwards;
+}
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+.delay-1 { animation-delay: 0.05s; }
+.delay-2 { animation-delay: 0.1s; }
+.delay-3 { animation-delay: 0.15s; }
+.delay-4 { animation-delay: 0.2s; }
+.delay-5 { animation-delay: 0.25s; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="header-left">
+      <h1>Sales Enablement Command Center</h1>
+      <p>GTM Buddy Analytics • TestMu AI / LambdaTest</p>
+    </div>
+    <div class="header-badge">
+      <span class="pulse-dot"></span>
+      Report Date: Feb 12, 2026
+    </div>
+  </div>
+</div>
+
+<!-- NAV TABS -->
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="switchTab('overview')">Executive Overview</button>
+  <button class="nav-tab" onclick="switchTab('adoption')">Team Adoption</button>
+  <button class="nav-tab" onclick="switchTab('content')">Content Analytics</button>
+  <button class="nav-tab" onclick="switchTab('roleplay')">AI Role Play</button>
+  <button class="nav-tab" onclick="switchTab('search')">Search Intelligence</button>
+  <button class="nav-tab" onclick="switchTab('actions')">Actions & Insights</button>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+<!-- ===== TAB: EXECUTIVE OVERVIEW ===== -->
+<div class="tab-content active" id="tab-overview">
+  <div class="kpi-grid">
+    <div class="kpi-card animate-in delay-1">
+      <div class="kpi-icon" style="background:rgba(59,130,246,0.1);">👥</div>
+      <div class="kpi-label">Total Platform Users</div>
+      <div class="kpi-value" style="color:var(--accent-blue);">178</div>
+      <div class="kpi-sub">78 BDR/SDR • 56 AE/AM • 44 Others</div>
+    </div>
+    <div class="kpi-card animate-in delay-2">
+      <div class="kpi-icon" style="background:rgba(16,185,129,0.1);">📊</div>
+      <div class="kpi-label">Total Content Views</div>
+      <div class="kpi-value" style="color:var(--accent-emerald);">3,338</div>
+      <div class="kpi-sub">Across all teams</div>
+    </div>
+    <div class="kpi-card animate-in delay-3">
+      <div class="kpi-icon" style="background:rgba(245,158,11,0.1);">📤</div>
+      <div class="kpi-label">Buyer Shares</div>
+      <div class="kpi-value" style="color:var(--accent-amber);">120</div>
+      <div class="kpi-sub">78 assets shared externally</div>
+    </div>
+    <div class="kpi-card animate-in delay-4">
+      <div class="kpi-icon" style="background:rgba(139,92,246,0.1);">🎯</div>
+      <div class="kpi-label">Buyer Open Rate</div>
+      <div class="kpi-value" style="color:var(--accent-violet);">13.3%</div>
+      <div class="kpi-sub">74 opens from 556 total shares</div>
+    </div>
+    <div class="kpi-card animate-in delay-5">
+      <div class="kpi-icon" style="background:rgba(6,182,212,0.1);">🤖</div>
+      <div class="kpi-label">Avg AI Role Play Score</div>
+      <div class="kpi-value" style="color:var(--accent-cyan);">3.77<span style="font-size:14px;color:var(--text-muted);">/5</span></div>
+      <div class="kpi-sub">Based on Tina Singh's sessions</div>
+    </div>
+  </div>
+
+  <div class="chart-grid-2">
+    <div class="chart-card animate-in delay-2">
+      <h3>Team Adoption: Content Views by Group</h3>
+      <div class="chart-subtitle">Who's engaging with GTM Buddy CMS?</div>
+      <canvas id="teamViewsChart"></canvas>
+    </div>
+    <div class="chart-card animate-in delay-3">
+      <h3>Engagement Depth: Views vs. Time Spent</h3>
+      <div class="chart-subtitle">Quality of engagement by team</div>
+      <canvas id="engagementDepthChart"></canvas>
+    </div>
+  </div>
+
+  <div class="chart-grid-2">
+    <div class="chart-card animate-in delay-4">
+      <h3>Top 10 Content by Internal Views</h3>
+      <div class="chart-subtitle">What's resonating with your sales team</div>
+      <canvas id="topContentChart"></canvas>
+    </div>
+    <div class="chart-card animate-in delay-5">
+      <h3>Content Type Distribution</h3>
+      <div class="chart-subtitle">Views across content categories</div>
+      <canvas id="contentTypeChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB: TEAM ADOPTION ===== -->
+<div class="tab-content" id="tab-adoption">
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">BDR/SDR Team</div>
+      <div class="kpi-value" style="color:var(--accent-blue);">78</div>
+      <div class="kpi-sub">1,002 views • 49 downloads</div>
+      <div class="kpi-trend neutral">Avg 12.8 views/user</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">AE/AM Team</div>
+      <div class="kpi-value" style="color:var(--accent-emerald);">56</div>
+      <div class="kpi-sub">1,780 views • 205 downloads</div>
+      <div class="kpi-trend up">▲ Avg 31.8 views/user</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Other Teams</div>
+      <div class="kpi-value" style="color:var(--accent-amber);">44</div>
+      <div class="kpi-sub">556 views • 46 downloads</div>
+      <div class="kpi-trend down">▼ Avg 12.6 views/user</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Active Sharers</div>
+      <div class="kpi-value" style="color:var(--accent-violet);">23</div>
+      <div class="kpi-sub">Out of 178 total users</div>
+      <div class="kpi-trend down">Only 12.9% sharing</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Zero-Activity Users</div>
+      <div class="kpi-value" style="color:var(--accent-rose);">34</div>
+      <div class="kpi-sub">≤2 views and 0:00 time</div>
+      <div class="kpi-trend down">19.1% inactive</div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <h2>🏆 Top 15 BDR/SDR by Content Views</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="data-table-container">
+    <table class="data-table">
+      <thead>
+        <tr><th>Name</th><th>Team</th><th>Manager</th><th>Views</th><th>Downloads</th><th>Shares</th><th>Time Spent</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="name-cell">Tina Singh</td><td><span class="team-badge bdr">BDR</span></td><td>-</td><td class="number-cell">82</td><td class="number-cell">0</td><td class="number-cell">0</td><td class="number-cell">1h 56m</td></tr>
+        <tr><td class="name-cell">Dheeraj Ashra</td><td><span class="team-badge bdr">BDR</span></td><td>Ruehan Hamid</td><td class="number-cell">49</td><td class="number-cell">7</td><td class="number-cell">0</td><td class="number-cell">39m</td></tr>
+        <tr><td class="name-cell">Vibhuti Chadha</td><td><span class="team-badge bdr">BDR</span></td><td>Ruehan Hamid</td><td class="number-cell">46</td><td class="number-cell">1</td><td class="number-cell">0</td><td class="number-cell">1h 54m</td></tr>
+        <tr><td class="name-cell">Sana Saleem</td><td><span class="team-badge bdr">BDR</span></td><td>Ruehan Hamid</td><td class="number-cell">46</td><td class="number-cell">0</td><td class="number-cell">4</td><td class="number-cell">25m</td></tr>
+        <tr><td class="name-cell">Marketing Team</td><td><span class="team-badge bdr">BDR</span></td><td>-</td><td class="number-cell">45</td><td class="number-cell">4</td><td class="number-cell">0</td><td class="number-cell">16m</td></tr>
+        <tr><td class="name-cell">Gautam Rathore</td><td><span class="team-badge bdr">BDR</span></td><td>Adarsh Saify</td><td class="number-cell">40</td><td class="number-cell">0</td><td class="number-cell">11</td><td class="number-cell">14m</td></tr>
+        <tr><td class="name-cell">Ali Rizvi</td><td><span class="team-badge bdr">BDR</span></td><td>Adarsh Saify</td><td class="number-cell">40</td><td class="number-cell">0</td><td class="number-cell">0</td><td class="number-cell">49m</td></tr>
+        <tr><td class="name-cell">Iram Malik</td><td><span class="team-badge bdr">BDR</span></td><td>Ruehan Hamid</td><td class="number-cell">35</td><td class="number-cell">5</td><td class="number-cell">9</td><td class="number-cell">5m</td></tr>
+        <tr><td class="name-cell">Yash Raj Gairola</td><td><span class="team-badge bdr">BDR</span></td><td>Ruehan Hamid</td><td class="number-cell">35</td><td class="number-cell">4</td><td class="number-cell">0</td><td class="number-cell">12m</td></tr>
+        <tr><td class="name-cell">Jyoti Verma</td><td><span class="team-badge bdr">BDR</span></td><td>Karan Rana</td><td class="number-cell">28</td><td class="number-cell">0</td><td class="number-cell">3</td><td class="number-cell">0m</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-header">
+    <h2>🏆 Top 15 AE/AM by Content Views</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="data-table-container">
+    <table class="data-table">
+      <thead>
+        <tr><th>Name</th><th>Team</th><th>Manager</th><th>Views</th><th>Downloads</th><th>Shares</th><th>Time Spent</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="name-cell">Aseem Chowdhury</td><td><span class="team-badge ae">AE</span></td><td>Saif Rizvi</td><td class="number-cell">225</td><td class="number-cell">24</td><td class="number-cell">0</td><td class="number-cell">2h 51m</td></tr>
+        <tr><td class="name-cell">David Benattar</td><td><span class="team-badge ae">AE</span></td><td>Maneesh Sharma</td><td class="number-cell">140</td><td class="number-cell">36</td><td class="number-cell">2</td><td class="number-cell">3h 27m</td></tr>
+        <tr><td class="name-cell">Mudit Jain</td><td><span class="team-badge am">AM</span></td><td>Karan Rana</td><td class="number-cell">104</td><td class="number-cell">2</td><td class="number-cell">0</td><td class="number-cell">1h 23m</td></tr>
+        <tr><td class="name-cell">Tyler DeHut</td><td><span class="team-badge ae">AE</span></td><td>Mohit Juneja</td><td class="number-cell">91</td><td class="number-cell">6</td><td class="number-cell">16</td><td class="number-cell">28m</td></tr>
+        <tr><td class="name-cell">Riya Gupta</td><td><span class="team-badge am">AM</span></td><td>Saahil Menoki</td><td class="number-cell">80</td><td class="number-cell">7</td><td class="number-cell">0</td><td class="number-cell">20m</td></tr>
+        <tr><td class="name-cell">Navneet Aryaman</td><td><span class="team-badge am">AM</span></td><td>Rishabh Agarwal</td><td class="number-cell">71</td><td class="number-cell">3</td><td class="number-cell">0</td><td class="number-cell">1h 14m</td></tr>
+        <tr><td class="name-cell">Mohit Juneja</td><td><span class="team-badge ae">AE</span></td><td>Maneesh Sharma</td><td class="number-cell">64</td><td class="number-cell">12</td><td class="number-cell">5</td><td class="number-cell">7m</td></tr>
+        <tr><td class="name-cell">Somesh Ojha</td><td><span class="team-badge ae">AE</span></td><td>Maneesh Sharma</td><td class="number-cell">53</td><td class="number-cell">3</td><td class="number-cell">0</td><td class="number-cell">27m</td></tr>
+        <tr><td class="name-cell">Vignesh Chandiran</td><td><span class="team-badge ae">AE</span></td><td>Misbah Farooqi</td><td class="number-cell">49</td><td class="number-cell">6</td><td class="number-cell">0</td><td class="number-cell">18m</td></tr>
+        <tr><td class="name-cell">Akash Pillai</td><td><span class="team-badge am">AM</span></td><td>Prakhar Goyal</td><td class="number-cell">48</td><td class="number-cell">14</td><td class="number-cell">0</td><td class="number-cell">7m</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="chart-grid-2">
+    <div class="chart-card">
+      <h3>BDR/SDR Adoption Distribution</h3>
+      <div class="chart-subtitle">Content views per user — showing engagement tiers</div>
+      <canvas id="bdrDistChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>AE/AM Adoption Distribution</h3>
+      <div class="chart-subtitle">Content views per user — showing engagement tiers</div>
+      <canvas id="aeDistChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB: CONTENT ANALYTICS ===== -->
+<div class="tab-content" id="tab-content">
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Total Assets</div>
+      <div class="kpi-value" style="color:var(--accent-blue);">381</div>
+      <div class="kpi-sub">In GTM Buddy CMS</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Internal Views</div>
+      <div class="kpi-value" style="color:var(--accent-emerald);">8,466</div>
+      <div class="kpi-sub">Total across all content</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">External Shares</div>
+      <div class="kpi-value" style="color:var(--accent-amber);">278</div>
+      <div class="kpi-sub">Sent to buyers/prospects</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Buyer Opens</div>
+      <div class="kpi-value" style="color:var(--accent-violet);">74</div>
+      <div class="kpi-sub">13.3% open rate</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Total Downloads</div>
+      <div class="kpi-value" style="color:var(--accent-cyan);">323</div>
+      <div class="kpi-sub">Internal team downloads</div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <h2>📄 Top Buyer-Facing Content</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="data-table-container">
+    <table class="data-table">
+      <thead>
+        <tr><th>Asset</th><th>Type</th><th>Shares</th><th>Opens</th><th>Open Rate</th><th>Buyer Views</th><th>Engaged Buyers</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="name-cell">TestMu AI Brochure</td><td>Product Brochure</td><td class="number-cell">35</td><td class="number-cell">5</td><td><span class="score-badge medium">14.3%</span></td><td class="number-cell">5</td><td class="number-cell">2</td></tr>
+        <tr><td class="name-cell">KaneAI Brochure</td><td>Product Brochure</td><td class="number-cell">18</td><td class="number-cell">2</td><td><span class="score-badge low">11.1%</span></td><td class="number-cell">4</td><td class="number-cell">2</td></tr>
+        <tr><td class="name-cell">KaneAI Product Walkthrough</td><td>Demo Videos</td><td class="number-cell">14</td><td class="number-cell">2</td><td><span class="score-badge medium">14.3%</span></td><td class="number-cell">12</td><td class="number-cell">2</td></tr>
+        <tr><td class="name-cell">TestMu AI vs BrowserStack</td><td>Comparison Cards</td><td class="number-cell">14</td><td class="number-cell">3</td><td><span class="score-badge high">21.4%</span></td><td class="number-cell">6</td><td class="number-cell">2</td></tr>
+        <tr><td class="name-cell">TestMu AI Deck (Enterprise)</td><td>Pitch Decks</td><td class="number-cell">11</td><td class="number-cell">2</td><td><span class="score-badge medium">18.2%</span></td><td class="number-cell">3</td><td class="number-cell">2</td></tr>
+        <tr><td class="name-cell">Agent to Agent Testing Brochure</td><td>Product Brochure</td><td class="number-cell">10</td><td class="number-cell">2</td><td><span class="score-badge high">20.0%</span></td><td class="number-cell">9</td><td class="number-cell">2</td></tr>
+        <tr><td class="name-cell">TestMu AI - Product Offerings</td><td>Others</td><td class="number-cell">9</td><td class="number-cell">3</td><td><span class="score-badge high">33.3%</span></td><td class="number-cell">3</td><td class="number-cell">1</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="chart-grid-2">
+    <div class="chart-card">
+      <h3>Buyer Engagement Funnel</h3>
+      <div class="chart-subtitle">From shares to engaged buyers</div>
+      <canvas id="buyerFunnelChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Content Type: Internal Views</h3>
+      <div class="chart-subtitle">Which content categories are being consumed</div>
+      <canvas id="contentTypeDetailChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB: AI ROLE PLAY ===== -->
+<div class="tab-content" id="tab-roleplay">
+  <div class="section-header">
+    <h2>🤖 AI Role Play Performance — Tina Singh (Week 3)</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr);">
+    <div class="kpi-card">
+      <div class="kpi-label">Avg Total Score</div>
+      <div class="kpi-value" style="color:var(--accent-emerald);">3.77<span style="font-size:14px;color:var(--text-muted);">/5</span></div>
+      <div class="kpi-trend up">All Passed ✓</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Avg Talk Speed</div>
+      <div class="kpi-value" style="color:var(--accent-blue);">168<span style="font-size:14px;color:var(--text-muted);"> wpm</span></div>
+      <div class="kpi-sub">Range: 155–180 wpm</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Avg Filler Words</div>
+      <div class="kpi-value" style="color:var(--accent-amber);">7</div>
+      <div class="kpi-sub">Per session average</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Sessions Completed</div>
+      <div class="kpi-value" style="color:var(--accent-violet);">5</div>
+      <div class="kpi-sub">Across 4 different scenarios</div>
+    </div>
+  </div>
+
+  <div class="roleplay-grid">
+    <div class="roleplay-card" style="border-top:3px solid var(--accent-emerald);">
+      <h4>🏆 Klaus Hoffmann — Engg Manager (Easy)</h4>
+      <div class="rp-scenario">BDR Onboarding Learning Path • Feb 5</div>
+      <div style="text-align:center;margin-bottom:12px;">
+        <span class="score-badge high" style="font-size:16px;">4.00 / 5</span>
+      </div>
+      <div class="rp-metrics">
+        <div class="rp-metric"><div class="value">173</div><div class="label">WPM</div></div>
+        <div class="rp-metric"><div class="value">8</div><div class="label">Fillers</div></div>
+        <div class="rp-metric"><div class="value">3.1m</div><div class="label">Talk Time</div></div>
+        <div class="rp-metric"><div class="value">52s</div><div class="label">Longest Mono</div></div>
+      </div>
+      <div class="skill-bar-group">
+        <div class="skill-bar-item"><span class="skill-name">Active Listening</span><div class="skill-bar"><div class="skill-fill" style="width:95%;background:var(--gradient-emerald);"></div></div><span class="skill-score">~4</span></div>
+        <div class="skill-bar-item"><span class="skill-name">Building Rapport</span><div class="skill-bar"><div class="skill-fill" style="width:50%;background:var(--gradient-amber);"></div></div><span class="skill-score">~2</span></div>
+        <div class="skill-bar-item"><span class="skill-name">Closing Techniques</span><div class="skill-bar"><div class="skill-fill" style="width:50%;background:var(--gradient-amber);"></div></div><span class="skill-score">~2</span></div>
+        <div class="skill-bar-item"><span class="skill-name">Clarity & Articulation</span><div class="skill-bar"><div class="skill-fill" style="width:20%;background:var(--gradient-rose);"></div></div><span class="skill-score">~1</span></div>
+        <div class="skill-bar-item"><span class="skill-name">Call to Action</span><div class="skill-bar"><div class="skill-fill" style="width:10%;background:var(--gradient-rose);"></div></div><span class="skill-score">~0</span></div>
+      </div>
+    </div>
+
+    <div class="roleplay-card" style="border-top:3px solid var(--accent-emerald);">
+      <h4>Klaus Hoffmann — Engg Manager (Easy)</h4>
+      <div class="rp-scenario">Roleplay Submissions • Feb 9</div>
+      <div style="text-align:center;margin-bottom:12px;">
+        <span class="score-badge high" style="font-size:16px;">3.80 / 5</span>
+      </div>
+      <div class="rp-metrics">
+        <div class="rp-metric"><div class="value">155</div><div class="label">WPM</div></div>
+        <div class="rp-metric"><div class="value">7</div><div class="label">Fillers</div></div>
+        <div class="rp-metric"><div class="value">2.3m</div><div class="label">Talk Time</div></div>
+        <div class="rp-metric"><div class="value">39s</div><div class="label">Longest Mono</div></div>
+      </div>
+      <div class="skill-bar-group">
+        <div class="skill-bar-item"><span class="skill-name">Active Listening</span><div class="skill-bar"><div class="skill-fill" style="width:95%;background:var(--gradient-emerald);"></div></div><span class="skill-score">~4</span></div>
+        <div class="skill-bar-item"><span class="skill-name">Building Rapport</span><div class="skill-bar"><div class="skill-fill" style="width:50%;background:var(--gradient-amber);"></div></div><span class="skill-score">~2</span></div>
+        <div class="skill-bar-item"><span class="skill-name">Closing Techniques</span><div class="skill-bar"><div class="skill-fill" style="width:50%;background:var(--gradient-amber);"></div></div><span class="skill-score">~2</span></div>
+        <div class="skill-bar-item"><span class="skill-name">Clarity & Articulation</span><div class="skill-bar"><div class="skill-fill" style="width:20%;background:var(--gradient-rose);"></div></div><span class="skill-score">~1</span></div>
+        <div class="skill-bar-item"><span class="skill-name">Call to Action</span><div class="skill-bar"><div class="skill-fill" style="width:50%;background:var(--gradient-amber);"></div></div><span class="skill-score">~2</span></div>
+      </div>
+    </div>
+
+    <div class="roleplay-card" style="border-top:3px solid var(--accent-blue);">
+      <h4>Martin Kovac — QE Manager (Easy)</h4>
+      <div class="rp-scenario">Roleplay Submissions • Feb 9</div>
+      <div style="text-align:center;margin-bottom:12px;">
+        <span class="score-badge high" style="font-size:16px;">3.75 / 5</span>
+      </div>
+      <div class="rp-metrics">
+        <div class="rp-metric"><div class="value">164</div><div class="label">WPM</div></div>
+        <div class="rp-metric"><div class="value">7</div><div class="label">Fillers</div></div>
+        <div class="rp-metric"><div class="value">3.8m</div><div class="label">Talk Time</div></div>
+        <div class="rp-metric"><div class="value">46s</div><div class="label">Longest Mono</div></div>
+      </div>
+      <div class="skill-bar-group">
+        <div class="skill-bar-item"><span class="skill-name">Active Listening</span><div class="skill-bar"><div class="skill-fill" style="width:95%;background:var(--gradient-emerald);"></div></div><span class="skill-score">~4</span></div>
+        <div class="skill-bar-item"><span class="skill-name">Building Rapport</span><div class="skill-bar"><div class="skill-fill" style="width:25%;background:var(--gradient-rose);"></div></div><span class="skill-score">~1</span></div>
+        <div class="skill-bar-item"><span class="skill-name">Closing Techniques</span><div class="skill-bar"><div class="skill-fill" style="width:25%;background:var(--gradient-rose);"></div></div><span class="skill-score">~1</span></div>
+        <div class="skill-bar-item"><span class="skill-name">Confidence & Poise</span><div class="skill-bar"><div class="skill-fill" style="width:10%;background:var(--gradient-rose);"></div></div><span class="skill-score">~0</span></div>
+      </div>
+    </div>
+
+    <div class="roleplay-card" style="border-top:3px solid var(--accent-amber);">
+      <h4>Senior QA Leader Discovery — Bajaj Finserv ↔ LambdaTest</h4>
+      <div class="rp-scenario">Roleplay Submissions • Feb 9</div>
+      <div style="text-align:center;margin-bottom:12px;">
+        <span class="score-badge medium" style="font-size:16px;">3.50 / 5</span>
+      </div>
+      <div class="rp-metrics">
+        <div class="rp-metric"><div class="value">157</div><div class="label">WPM</div></div>
+        <div class="rp-metric"><div class="value">8</div><div class="label">Fillers</div></div>
+        <div class="rp-metric"><div class="value">3.6m</div><div class="label">Talk Time</div></div>
+        <div class="rp-metric"><div class="value">46s</div><div class="label">Longest Mono</div></div>
+      </div>
+      <div class="skill-bar-group">
+        <div class="skill-bar-item"><span class="skill-name">Customer Needs ID</span><div class="skill-bar"><div class="skill-fill" style="width:95%;background:var(--gradient-emerald);"></div></div><span class="skill-score">~4</span></div>
+        <div class="skill-bar-item"><span class="skill-name">Active Listening</span><div class="skill-bar"><div class="skill-fill" style="width:25%;background:var(--gradient-rose);"></div></div><span class="skill-score">~1</span></div>
+        <div class="skill-bar-item"><span class="skill-name">Building Rapport</span><div class="skill-bar"><div class="skill-fill" style="width:10%;background:var(--gradient-rose);"></div></div><span class="skill-score">~0</span></div>
+        <div class="skill-bar-item"><span class="skill-name">Confidence & Poise</span><div class="skill-bar"><div class="skill-fill" style="width:15%;background:var(--gradient-rose);"></div></div><span class="skill-score">~1</span></div>
+      </div>
+    </div>
+
+    <div class="roleplay-card" style="border-top:3px solid var(--accent-emerald);">
+      <h4>BDR Discovery Call — LambdaTest ↔ Boohoo Group</h4>
+      <div class="rp-scenario">Roleplay Submissions • Feb 6</div>
+      <div style="text-align:center;margin-bottom:12px;">
+        <span class="score-badge high" style="font-size:16px;">3.80 / 5</span>
+      </div>
+      <div class="rp-metrics">
+        <div class="rp-metric"><div class="value">180</div><div class="label">WPM</div></div>
+        <div class="rp-metric"><div class="value">6</div><div class="label">Fillers</div></div>
+        <div class="rp-metric"><div class="value">2.6m</div><div class="label">Talk Time</div></div>
+        <div class="rp-metric"><div class="value">46s</div><div class="label">Longest Mono</div></div>
+      </div>
+      <div class="skill-bar-group">
+        <div class="skill-bar-item"><span class="skill-name">Customer Needs ID</span><div class="skill-bar"><div class="skill-fill" style="width:95%;background:var(--gradient-emerald);"></div></div><span class="skill-score">~4</span></div>
+        <div class="skill-bar-item"><span class="skill-name">Active Listening</span><div class="skill-bar"><div class="skill-fill" style="width:50%;background:var(--gradient-amber);"></div></div><span class="skill-score">~2</span></div>
+        <div class="skill-bar-item"><span class="skill-name">Engagement Tech</span><div class="skill-bar"><div class="skill-fill" style="width:50%;background:var(--gradient-amber);"></div></div><span class="skill-score">~2</span></div>
+        <div class="skill-bar-item"><span class="skill-name">Clarity & Articulation</span><div class="skill-bar"><div class="skill-fill" style="width:20%;background:var(--gradient-rose);"></div></div><span class="skill-score">~1</span></div>
+        <div class="skill-bar-item"><span class="skill-name">Building Rapport</span><div class="skill-bar"><div class="skill-fill" style="width:25%;background:var(--gradient-rose);"></div></div><span class="skill-score">~1</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-grid-2">
+    <div class="chart-card">
+      <h3>Tina's Score Progression</h3>
+      <div class="chart-subtitle">Scores across role play sessions (chronological)</div>
+      <canvas id="rpScoreChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Skill Strengths & Gaps (Averaged)</h3>
+      <div class="chart-subtitle">Where Tina excels and where coaching is needed</div>
+      <canvas id="rpRadarChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB: SEARCH INTELLIGENCE ===== -->
+<div class="tab-content" id="tab-search">
+  <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr);">
+    <div class="kpi-card">
+      <div class="kpi-label">Unique Search Terms</div>
+      <div class="kpi-value" style="color:var(--accent-blue);">264</div>
+      <div class="kpi-sub">Popular searches</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">No-Result Searches</div>
+      <div class="kpi-value" style="color:var(--accent-rose);">106</div>
+      <div class="kpi-sub">Content gaps identified</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Top Search</div>
+      <div class="kpi-value" style="color:var(--accent-emerald);font-size:22px;">"pricing"</div>
+      <div class="kpi-sub">24 searches, 15 unique users</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Top Gap</div>
+      <div class="kpi-value" style="color:var(--accent-amber);font-size:22px;">"agent"</div>
+      <div class="kpi-sub">7 searches returned no results</div>
+    </div>
+  </div>
+
+  <div class="chart-grid-2">
+    <div class="chart-card">
+      <h3>🔍 Top 15 Popular Searches</h3>
+      <div class="chart-subtitle">What your team is looking for</div>
+      <canvas id="popularSearchChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>⚠️ Top No-Result Searches</h3>
+      <div class="chart-subtitle">Content gaps — team searched but found nothing</div>
+      <ul class="search-list" style="max-height:340px;overflow-y:auto;">
+        <li><span class="search-query">"agent"</span><span class="search-count">7 searches</span></li>
+        <li><span class="search-query">"our latest positioning in the 2025 gartner mq"</span><span class="search-count">4 searches</span></li>
+        <li><span class="search-query">"agent to agent"</span><span class="search-count">2 searches</span></li>
+        <li><span class="search-query">"slides"</span><span class="search-count">2 searches</span></li>
+        <li><span class="search-query">"agent to agent testing in product brochure"</span><span class="search-count">2 searches</span></li>
+        <li><span class="search-query">"quote"</span><span class="search-count">2 searches</span></li>
+        <li><span class="search-query">"mnda"</span><span class="search-count">2 searches</span></li>
+        <li><span class="search-query">"smart heal"</span><span class="search-count">2 searches</span></li>
+        <li><span class="search-query">"write comparisons for the competitors"</span><span class="search-count">2 searches</span></li>
+        <li><span class="search-query">"banner"</span><span class="search-count">2 searches</span></li>
+        <li><span class="search-query">"need a use case for ramasya health care..."</span><span class="search-count">2 searches</span></li>
+        <li><span class="search-query">"show me some saas customers in europe"</span><span class="search-count">1 search</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB: ACTIONS & INSIGHTS ===== -->
+<div class="tab-content" id="tab-actions">
+  <div class="section-header">
+    <h2>🚨 Critical Actions</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="insight-card critical">
+    <span class="insight-tag critical">Critical Gap</span>
+    <h4>87.1% of users are NOT sharing content externally</h4>
+    <p>Only 23 out of 178 users have shared content with buyers. The BDR/SDR team has 71 total shares but only from ~15 reps. This means the platform is being used for consumption but not for its core GTM purpose — equipping reps to engage prospects with the right content at the right time. <strong>Action:</strong> Launch a "Share Challenge" — set a target of 2 external shares per BDR/SDR per week. Recognize top sharers in weekly standups.</p>
+  </div>
+
+  <div class="insight-card critical">
+    <span class="insight-tag critical">Adoption Risk</span>
+    <h4>34 users have near-zero engagement (≤2 views, 0:00 time)</h4>
+    <p>19.1% of your platform users are essentially ghosts — they've barely logged in. This is concentrated in the BDR/SDR and SE teams. These users represent wasted license cost and missed enablement opportunity. <strong>Action:</strong> Identify these users by manager, run targeted re-onboarding sessions, and make GTM Buddy usage a visible part of weekly 1:1s between managers and reps.</p>
+  </div>
+
+  <div class="section-header">
+    <h2>⚠️ Content & Search Gaps</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="insight-card warning">
+    <span class="insight-tag warning">Content Gap</span>
+    <h4>"Agent" and "Agent to Agent Testing" — 11+ no-result searches</h4>
+    <p>Your team is actively searching for agent-related content but finding nothing. This is likely your hottest product topic right now. <strong>Action:</strong> Ensure the "Agent to Agent Testing Brochure" is properly tagged/indexed in GTM Buddy. Create an Agent-focused battlecard and FAQ to fill this gap immediately.</p>
+  </div>
+
+  <div class="insight-card warning">
+    <span class="insight-tag warning">Content Gap</span>
+    <h4>Gartner MQ positioning — 4 searches, 0 results</h4>
+    <p>Reps are looking for analyst positioning data to use in deals. This is high-value mid-funnel content that builds credibility. <strong>Action:</strong> Upload Gartner MQ or equivalent analyst positioning content to GTM Buddy within 1 week.</p>
+  </div>
+
+  <div class="insight-card warning">
+    <span class="insight-tag warning">Low Open Rates</span>
+    <h4>Buyer open rate is 13.3% — below the 20%+ benchmark</h4>
+    <p>Content is being shared but buyers aren't opening it. This could indicate poor subject lines, wrong timing, or misaligned content to buyer journey stage. <strong>Action:</strong> A/B test share messaging, review which content types get highest open rates (Comparison Cards are at 21.4% — lean into competitive content), and train reps on contextual sharing.</p>
+  </div>
+
+  <div class="section-header">
+    <h2>✅ Wins to Celebrate</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="insight-card success">
+    <span class="insight-tag success">Champion</span>
+    <h4>AE team is leading adoption — 31.8 views/user vs. 12.8 for BDR/SDR</h4>
+    <p>AEs like Aseem Chowdhury (225 views, 2h 51m) and David Benattar (140 views, 3h 27m) are power users. Tyler DeHut leads in external sharing with 16 shares. These are your internal champions — use them to model best practices.</p>
+  </div>
+
+  <div class="insight-card success">
+    <span class="insight-tag success">AI Adoption</span>
+    <h4>Tina Singh is an AI Role Play early adopter — averaging 3.77/5</h4>
+    <p>Tina has completed 5 role play sessions across 4 different scenarios in Week 3. She's strongest in Active Listening and Customer Needs Identification. Key growth areas: Clarity & Articulation, Building Rapport, and Closing Techniques. She's showing improvement trajectory from Feb 5 to Feb 9.</p>
+  </div>
+
+  <div class="insight-card success">
+    <span class="insight-tag success">Content Hit</span>
+    <h4>"Pricing" is the #1 search (24 searches, 15 users) — and content exists</h4>
+    <p>Unlike the agent content gap, pricing content is available and being found. This validates that your team has deal-stage-appropriate content for pricing conversations. Ensure this content stays updated.</p>
+  </div>
+
+  <div class="section-header">
+    <h2>📋 Long-Term Project Roadmap</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="insight-card action">
+    <span class="insight-tag action">Q1 Project</span>
+    <h4>Project: Adoption Acceleration Program</h4>
+    <p><strong>Goal:</strong> Increase active platform usage from ~80% to 95%+ and external sharing from 12.9% to 40%+.<br>
+    <strong>Milestones:</strong> Week 1: Manager dashboard rollout + ghost user identification. Week 2-3: Re-onboarding for low-engagement users. Week 4: Share challenge launch with leaderboard. Monthly: Track and report adoption lift.</p>
+  </div>
+
+  <div class="insight-card action">
+    <span class="insight-tag action">Q1–Q2 Project</span>
+    <h4>Project: AI Role Play Scaled Rollout</h4>
+    <p><strong>Goal:</strong> Move from 1 active Role Play user (Tina) to full BDR/SDR team completion of at least 2 scenarios/month.<br>
+    <strong>Milestones:</strong> Month 1: Define 5 core scenarios (Discovery, Demo, Objection Handling, Closing, Executive Pitch). Month 2: Mandatory Role Play as part of BDR onboarding. Month 3: Track correlation between Role Play scores and pipeline conversion.</p>
+  </div>
+
+  <div class="insight-card action">
+    <span class="insight-tag action">Ongoing</span>
+    <h4>Project: Content Intelligence Engine</h4>
+    <p><strong>Goal:</strong> Eliminate all top no-result searches within 2 weeks of identification and maintain a content freshness score of 90%+.<br>
+    <strong>Milestones:</strong> Weekly: Review no-result search report and create/tag missing content. Monthly: Audit content usage — archive assets with 0 views in 60 days. Quarterly: Content effectiveness review tied to deal outcomes.</p>
+  </div>
+</div>
+
+</div><!-- end main -->
+
+<script>
+// Tab Navigation
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tabId).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// Chart.js Global Config
+Chart.defaults.color = '#94a3b8';
+Chart.defaults.borderColor = 'rgba(30,41,59,0.5)';
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.font.size = 12;
+
+// 1. Team Views Chart
+new Chart(document.getElementById('teamViewsChart'), {
+  type: 'bar',
+  data: {
+    labels: ['BDR/SDR (78)', 'AE/AM (56)', 'Other Teams (44)'],
+    datasets: [{
+      label: 'Content Views',
+      data: [1002, 1780, 556],
+      backgroundColor: ['rgba(59,130,246,0.7)', 'rgba(16,185,129,0.7)', 'rgba(245,158,11,0.7)'],
+      borderRadius: 6,
+      barThickness: 50
+    }, {
+      label: 'Downloads',
+      data: [49, 205, 46],
+      backgroundColor: ['rgba(59,130,246,0.3)', 'rgba(16,185,129,0.3)', 'rgba(245,158,11,0.3)'],
+      borderRadius: 6,
+      barThickness: 50
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'top' } },
+    scales: { y: { beginAtZero: true, grid: { color: 'rgba(30,41,59,0.3)' } } }
+  }
+});
+
+// 2. Engagement Depth Chart
+new Chart(document.getElementById('engagementDepthChart'), {
+  type: 'bar',
+  data: {
+    labels: ['BDR/SDR', 'AE/AM', 'Other Teams'],
+    datasets: [{
+      label: 'Avg Views/User',
+      data: [12.8, 31.8, 12.6],
+      backgroundColor: 'rgba(139,92,246,0.7)',
+      borderRadius: 6,
+      barThickness: 40
+    }, {
+      label: 'Avg Time (min)/User',
+      data: [6.5, 16.8, 7.5],
+      backgroundColor: 'rgba(6,182,212,0.7)',
+      borderRadius: 6,
+      barThickness: 40
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'top' } },
+    scales: { y: { beginAtZero: true, grid: { color: 'rgba(30,41,59,0.3)' } } }
+  }
+});
+
+// 3. Top Content Chart
+new Chart(document.getElementById('topContentChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Enterprise Deck', 'Product Offerings', 'Corp Intro', 'AI Brochure', 'KaneAI Walkthrough', 'Brochure (TestMu)', 'KaneAI Brochure', 'A2A Brochure', 'vs BrowserStack', 'Demo Video'],
+    datasets: [{
+      label: 'Internal Views',
+      data: [123, 56, 82, 39, 39, 31, 31, 30, 28, 34],
+      backgroundColor: 'rgba(59,130,246,0.6)',
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: { x: { beginAtZero: true, grid: { color: 'rgba(30,41,59,0.3)' } } }
+  }
+});
+
+// 4. Content Type Donut
+new Chart(document.getElementById('contentTypeChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Pitch Decks', 'Product Brochure', 'Demo Videos', 'Comparison Cards', 'Case Studies', 'Training', 'Security/Legal', 'Other'],
+    datasets: [{
+      data: [490, 171, 205, 197, 126, 176, 213, 300],
+      backgroundColor: [
+        'rgba(59,130,246,0.8)', 'rgba(16,185,129,0.8)', 'rgba(245,158,11,0.8)',
+        'rgba(139,92,246,0.8)', 'rgba(6,182,212,0.8)', 'rgba(249,115,22,0.8)',
+        'rgba(244,63,94,0.8)', 'rgba(100,116,139,0.8)'
+      ],
+      borderWidth: 0,
+      hoverOffset: 8
+    }]
+  },
+  options: {
+    responsive: true,
+    cutout: '60%',
+    plugins: { legend: { position: 'right', labels: { padding: 12, usePointStyle: true } } }
+  }
+});
+
+// 5. Buyer Funnel
+new Chart(document.getElementById('buyerFunnelChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Total Shares', 'Opens', 'Buyer Views', 'Engaged Buyers'],
+    datasets: [{
+      data: [556, 74, 128, 17],
+      backgroundColor: ['rgba(59,130,246,0.7)', 'rgba(139,92,246,0.7)', 'rgba(245,158,11,0.7)', 'rgba(16,185,129,0.7)'],
+      borderRadius: 6,
+      barThickness: 50
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: { y: { beginAtZero: true, grid: { color: 'rgba(30,41,59,0.3)' } } }
+  }
+});
+
+// 6. Content Type Detail
+new Chart(document.getElementById('contentTypeDetailChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Pitch Decks', 'Security/Legal', 'Demo Videos', 'Brochures', 'Comp Cards', 'Case Studies', 'Training', 'FAQs'],
+    datasets: [{
+      label: 'Views',
+      data: [490, 213, 205, 171, 197, 126, 176, 51],
+      backgroundColor: 'rgba(59,130,246,0.6)',
+      borderRadius: 4
+    }, {
+      label: 'Shares',
+      data: [26, 43, 34, 74, 38, 54, 0, 0],
+      backgroundColor: 'rgba(16,185,129,0.6)',
+      borderRadius: 4
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'top' } },
+    scales: { y: { beginAtZero: true, grid: { color: 'rgba(30,41,59,0.3)' } } }
+  }
+});
+
+// 7. BDR Distribution
+new Chart(document.getElementById('bdrDistChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Power Users (30+)', 'Active (10-29)', 'Low (3-9)', 'Ghost (0-2)'],
+    datasets: [{
+      data: [10, 12, 30, 26],
+      backgroundColor: ['rgba(16,185,129,0.8)', 'rgba(59,130,246,0.8)', 'rgba(245,158,11,0.8)', 'rgba(244,63,94,0.8)'],
+      borderWidth: 0
+    }]
+  },
+  options: { responsive: true, cutout: '55%', plugins: { legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true } } } }
+});
+
+// 8. AE Distribution
+new Chart(document.getElementById('aeDistChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Power Users (30+)', 'Active (10-29)', 'Low (3-9)', 'Ghost (0-2)'],
+    datasets: [{
+      data: [20, 18, 12, 6],
+      backgroundColor: ['rgba(16,185,129,0.8)', 'rgba(59,130,246,0.8)', 'rgba(245,158,11,0.8)', 'rgba(244,63,94,0.8)'],
+      borderWidth: 0
+    }]
+  },
+  options: { responsive: true, cutout: '55%', plugins: { legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true } } } }
+});
+
+// 9. Role Play Score Chart
+new Chart(document.getElementById('rpScoreChart'), {
+  type: 'line',
+  data: {
+    labels: ['Feb 5\nKlaus (Onboard)', 'Feb 6\nBoohoo Discovery', 'Feb 9\nKlaus (Submit)', 'Feb 9\nMartin Kovac', 'Feb 9\nBajaj Discovery'],
+    datasets: [{
+      label: 'Total Score (/5)',
+      data: [4.00, 3.80, 3.80, 3.75, 3.50],
+      borderColor: 'rgba(59,130,246,1)',
+      backgroundColor: 'rgba(59,130,246,0.1)',
+      fill: true,
+      tension: 0.3,
+      pointRadius: 6,
+      pointBackgroundColor: ['#10b981', '#3b82f6', '#3b82f6', '#8b5cf6', '#f59e0b'],
+      pointBorderWidth: 2,
+      pointBorderColor: '#111827'
+    }, {
+      label: 'Pass Threshold',
+      data: [3, 3, 3, 3, 3],
+      borderColor: 'rgba(244,63,94,0.4)',
+      borderDash: [8, 4],
+      pointRadius: 0,
+      fill: false
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { position: 'top' } },
+    scales: {
+      y: { min: 0, max: 5, grid: { color: 'rgba(30,41,59,0.3)' } }
+    }
+  }
+});
+
+// 10. Role Play Radar
+new Chart(document.getElementById('rpRadarChart'), {
+  type: 'radar',
+  data: {
+    labels: ['Active Listening', 'Customer Needs ID', 'Building Rapport', 'Engagement Tech', 'Clarity & Articulation', 'Closing Techniques', 'Call to Action', 'Confidence & Poise'],
+    datasets: [{
+      label: "Tina's Avg Score",
+      data: [3.5, 4, 1.2, 2, 1, 1.8, 1, 0.5],
+      borderColor: 'rgba(59,130,246,1)',
+      backgroundColor: 'rgba(59,130,246,0.15)',
+      pointBackgroundColor: 'rgba(59,130,246,1)',
+      pointRadius: 4
+    }, {
+      label: 'Target (4/5)',
+      data: [4, 4, 4, 4, 4, 4, 4, 4],
+      borderColor: 'rgba(16,185,129,0.4)',
+      backgroundColor: 'rgba(16,185,129,0.05)',
+      borderDash: [5, 5],
+      pointRadius: 0
+    }]
+  },
+  options: {
+    responsive: true,
+    scales: {
+      r: {
+        min: 0, max: 5,
+        grid: { color: 'rgba(30,41,59,0.3)' },
+        angleLines: { color: 'rgba(30,41,59,0.3)' },
+        ticks: { stepSize: 1, backdropColor: 'transparent' }
+      }
+    },
+    plugins: { legend: { position: 'top' } }
+  }
+});
+
+// 11. Popular Search Chart
+new Chart(document.getElementById('popularSearchChart'), {
+  type: 'bar',
+  data: {
+    labels: ['pricing', 'kane ai', 'browserstack', 'order form', 'case study', 'icp', 'testmu', 'sales deck', 'hyperexecute', 'percy', 'test', 'testmu ai', 'bfsi', 'rko', 'test manager'],
+    datasets: [{
+      label: 'Search Count',
+      data: [24, 18, 11, 11, 9, 9, 8, 8, 7, 7, 7, 7, 6, 6, 6],
+      backgroundColor: 'rgba(59,130,246,0.6)',
+      borderRadius: 4
+    }, {
+      label: 'Unique Users',
+      data: [15, 10, 9, 10, 3, 1, 7, 2, 5, 2, 6, 6, 1, 6, 4],
+      backgroundColor: 'rgba(16,185,129,0.6)',
+      borderRadius: 4
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: { legend: { position: 'top' } },
+    scales: { x: { beginAtZero: true, grid: { color: 'rgba(30,41,59,0.3)' } } }
+  }
+});
+</script>
+
+</body>
+</html>
